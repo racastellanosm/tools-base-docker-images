@@ -1,0 +1,9 @@
+# PostgreSQL with PG Vector Extension for RAG Based Applications
+FROM postgres:17-bullseye
+
+RUN apt-get update \
+    && apt-get install -y postgresql-17-pgvector \
+    && rm -rf /var/lib/apt/lists/*
+
+# Init script for PG Vector
+COPY init/initdb-pgvector.sh /docker-entrypoint-initdb.d/10_pgvector.sh

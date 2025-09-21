@@ -29,6 +29,7 @@ $ make buld-all
     - Basically we
       use [static-php-cli](https://github.com/crazywhalecc/static-php-cli) + [Google Distroless](https://github.com/GoogleContainerTools/distroless)
       images.
+  - `ghcr.io/racastellanosm/php.all.extensions`
   - `ghcr.io/racastellanosm/php.chromium`
   - `ghcr.io/racastellanosm/php.roadrunner.mysql`
   - `ghcr.io/racastellanosm/php.roadrunner.pgsql`
@@ -38,6 +39,8 @@ $ make buld-all
 - **Postgres**
   - `ghcr.io/racastellanosm/postgres.postgis`
     - Based on the official Postgres image with PostGIS extension
+  - `ghcr.io/racastellanosm/postgres.pgvector`
+    - Based on the official Postgres image with PGVector extension
 
 ## Available Images
 
