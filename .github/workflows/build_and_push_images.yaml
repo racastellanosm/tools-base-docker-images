@@ -106,6 +106,10 @@ jobs:
                       image: ghcr.io/racastellanosm/postgres.postgis
                       tags: 17-3.5
                       context: postgres
+                    - dockerfile: ./postgres/Dockerfile.pgvector
+                      image: ghcr.io/racastellanosm/postgres.pgvector
+                      tags: 17-0.8
+                      context: postgres
         steps:
           - name: 'Checkout Source Code'
             id: checkout

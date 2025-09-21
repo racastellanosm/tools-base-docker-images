@@ -28,6 +28,8 @@ build-skaffold-slim:	## [Docker] Build and Push skaffold image with slim variant
 	@$(MAKE) build-others type=skaffold variant=slim version=latest dir=skaffold
 build-postgres-postgis:	## [Docker] Build and Push postgres image with postgis extension for local development
 	@$(MAKE) build-others type=postgres variant=postgis version=17-3.5 dir=postgres
+build-postgres-pgvector: ## [Docker] Build and Push postgres image with pg_vector extension for local development
+	@$(MAKE) build-others type=postgres variant=pgvector version=17-0.8 dir=postgres
 build-php:
 	@$(call validate_variant)
 	@for tag in $(TAGS); do \
