@@ -10,4 +10,4 @@ COPY --from=mlocati/php-extension-installer:2.9.7 /usr/bin/install-php-extension
 COPY --from=composer/composer:2.8.11-bin /composer /usr/bin/composer
 
 # Install PHP extensions
-RUN install-php-extensions pdo_pgsql pgsql zip opcache apcu pcntl curl sockets intl
+RUN install-php-extensions pdo_pgsql pgsql zip opcache apcu pcntl curl sockets intl bcmath redis amqp yaml
