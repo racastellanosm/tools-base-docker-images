@@ -1,0 +1,9 @@
+# Base image used for all php variants with docker bake
+ARG PHP_VERSION=${PHP_VERSION:-8.2}
+
+FROM php:${PHP_VERSION}-cli-alpine AS php_base
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+COPY --from=mlocati/php-extension-installer:2.9.23 /usr/bin/install-php-extensions /usr/local/bin/
+COPY --from=composer/composer:2.9.2-bin /composer /usr/bin/composer

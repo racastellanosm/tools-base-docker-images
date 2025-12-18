@@ -2,8 +2,6 @@ name: Build and Push Images
 
 on:
     push:
-        branches-ignore:
-          - main
         tags:
             - 'v*'
 
@@ -13,143 +11,41 @@ permissions:
     id-token: write
 
 jobs:
-    build-and-push-php:
-        runs-on: ubuntu-latest
-        env:
-            AVAILABLE_PLATFORMS: "linux/amd64,linux/arm64"
-            DOCKER_BUILD_SUMMARY: false
-        strategy:
-            matrix:
-                php_version:
-                    - 8.4
-                variants:
-                    - dockerfile: ./php/Dockerfile.roadrunner.mysql
-                      image: ghcr.io/racastellanosm/php.roadrunner.mysql
-                    - dockerfile: ./php/Dockerfile.roadrunner.pgsql
-                      image: ghcr.io/racastellanosm/php.roadrunner.pgsql
-                    - dockerfile: ./php/Dockerfile.all.extensions
-                      image: ghcr.io/racastellanosm/php.all.extensions
-                    - dockerfile: ./php/Dockerfile.static.php.alpine
-                      image: ghcr.io/racastellanosm/php.static.cli
-        steps:
-            - name: 'Checkout Source Code'
-              id: checkout
-              uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
 
-            - name: 'Extract metadata (tags, labels) for Docker'
-              id: meta
-              uses: docker/metadata-action@v5
-              with:
-                  images: ${{ matrix.variants.image }}
-                  tags: |
-                    type=raw,enable=true,priority=2000,value=${{ matrix.php_version }}
+      - name: "Set up QEMU"
+        uses: docker/setup-qemu-action@v3
 
-            - name: 'Login to Docker Hub'
-              id: login
-              uses: docker/login-action@v3
-              with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v3
 
-            - name: 'Set up QEMU'
-              id: qemu
-              uses: docker/setup-qemu-action@v3
+      - name: "Login to GitHub Container Registry"
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: 'Set up Docker Buildx'
-              id: buildx
-              uses: docker/setup-buildx-action@v3
+      - name: "Build and Push"
+        uses: docker/bake-action@v6
+        with:
+          # This automatically detects docker-bake.hcl
+          push: true
 
-            - name: 'Build and Push'
-              id: build-and-push
-              uses: docker/build-push-action@v6
-              with:
-                  cache-from: type=gha,mode=max,scope=${{ matrix.variants.image }}
-                  cache-to: type=gha,mode=max,scope=${{ matrix.variants.image }}
-                  file: ${{ matrix.variants.dockerfile }}
-                  build-args: |
-                    PHP_VERSION=${{ matrix.php_version }}
-                  platforms: ${{ env.AVAILABLE_PLATFORMS }}
-                  tags: ${{ steps.meta.outputs.tags }}
-                  labels: ${{ steps.meta.outputs.labels }}
-                  push: ${{ startsWith(github.ref, 'refs/tags/') }}
+      - name: 'Save TAG Name'
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "Saving tag ${{ github.ref_name }}"
+          echo "${{ github.ref_name }}" > tag_name.txt
 
-            - name: 'Save TAG Name'
-              if: startsWith(github.ref, 'refs/tags/')
-              run: |
-                echo "Saving tag ${{ github.ref_name }}"
-                echo "${{ github.ref_name }}" > tag_name.txt
-
-            - name: 'Upload TAG Name Artifact'
-              if: startsWith(github.ref, 'refs/tags/')
-              uses: actions/upload-artifact@v4
-              with:
-                name: tag-name
-                path: tag_name.txt
-                overwrite: true
-
-    build-and-push-others:
-        runs-on: ubuntu-latest
-        env:
-            AVAILABLE_PLATFORMS: "linux/amd64,linux/arm64"
-            DOCKER_BUILD_SUMMARY: false
-        strategy:
-            matrix:
-                variants:
-                    - dockerfile: ./skaffold/Dockerfile.slim
-                      image: ghcr.io/racastellanosm/skaffold.slim
-                      tags: latest
-                      context: skaffold
-                    - dockerfile: ./postgres/Dockerfile.postgis
-                      image: ghcr.io/racastellanosm/postgres.postgis
-                      tags: 17-3.5
-                      context: postgres
-                    - dockerfile: ./postgres/Dockerfile.pgvector
-                      image: ghcr.io/racastellanosm/postgres.pgvector
-                      tags: 17-0.8
-                      context: postgres
-        steps:
-          - name: 'Checkout Source Code'
-            id: checkout
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0
-
-          - name: 'Extract metadata (tags, labels) for Docker'
-            id: meta
-            uses: docker/metadata-action@v5
-            with:
-              images: ${{ matrix.variants.image }}
-
-          - name: 'Login to Docker Hub'
-            id: login
-            uses: docker/login-action@v3
-            with:
-              registry: ghcr.io
-              username: ${{ github.actor }}
-              password: ${{ secrets.GITHUB_TOKEN }}
-
-          - name: 'Set up QEMU'
-            id: qemu
-            uses: docker/setup-qemu-action@v3
-
-          - name: 'Set up Docker Buildx'
-            id: buildx
-            uses: docker/setup-buildx-action@v3
-
-          - name: 'Build and Push'
-            id: build-and-push
-            uses: docker/build-push-action@v6
-            with:
-              cache-from: type=gha,mode=max,scope=${{ matrix.variants.image }}
-              cache-to: type=gha,mode=max,scope=${{ matrix.variants.image }}
-              file: ${{ matrix.variants.dockerfile }}
-              context: ${{ matrix.variants.context }}
-              build-args: |
-                PHP_VERSION=${{ matrix.php_version }}
-              platforms: ${{ env.AVAILABLE_PLATFORMS }}
-              tags: ${{ matrix.variants.image }}:${{ matrix.variants.tags }}
-              labels: ${{ steps.meta.outputs.labels }}
-              push: ${{ startsWith(github.ref, 'refs/tags/') }}
+      - name: 'Upload TAG Name Artifact'
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: tag-name
+          path: tag_name.txt
+          overwrite: true

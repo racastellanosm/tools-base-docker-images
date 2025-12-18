@@ -1,10 +1,5 @@
-ARG PHP_VERSION=${PHP_VERSION:-8.2}
-
-FROM php:${PHP_VERSION}-cli-alpine AS php_base
-ENV  COMPOSER_ALLOW_SUPERUSER=1
-# Install dependencies and php extensions
-COPY --from=composer/composer:2.8.11-bin /composer /usr/bin/composer
-COPY --from=mlocati/php-extension-installer:2.9.8 /usr/bin/install-php-extensions /usr/local/bin/
+# docker bake build this image as pre-requsite to be used here
+FROM php_base_local AS php_base
 
 # Install php extensions
 RUN install-php-extensions pdo_mysql pdo_pgsql zip amqp opcache apcu redis pcntl curl sockets intl xdebug soap

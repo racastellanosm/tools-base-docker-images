@@ -1,12 +1,5 @@
-#-----------------------------------------------------------------#
-#----- Main Target to use in upper stages for E2E tests ---------#
-#-----------------------------------------------------------------#
-ARG PHP_VERSION=${PHP_VERSION:-8.2}
-
-FROM php:${PHP_VERSION}-cli-alpine AS runner
-# 3rd party tools
-COPY --from=composer/composer:2.7.1-bin /composer /usr/bin/composer
-COPY --from=mlocati/php-extension-installer:2.2.2 /usr/bin/install-php-extensions /usr/local/bin/
+# docker bake build this image as pre-requsite to be used here
+FROM php_base_local AS php_base
 
 # Install Chromium and ChromeDriver for Web Tests
 RUN apk add --no-cache nss nss-tools chromium chromium-chromedriver
