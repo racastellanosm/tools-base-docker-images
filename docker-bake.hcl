@@ -18,7 +18,7 @@ group "default" {
 }
 
 group "php" {
-  targets = ["php-roadruuner-mysql", "php-roadrunner-pgsql", "php-all-extensions"]
+  targets = ["php-roadruuner-mysql", "php-roadrunner-pgsql", "php-all-extensions", "php-base-alpine"]
 }
 
 group "postgresql" {
@@ -88,6 +88,21 @@ target "php-all-extensions" {
     php_base_local = "target:php-base-${replace(version, ".", "-")}"
   }
   tags = ["${DOCKER_REGISTRY}/php.all.extensions:${version}"]
+  args = { PHP_VERSION = version }
+}
+
+target "php-base-alpine" {
+  name        = "php-base-alpine-${replace(version, ".", "-")}"
+  platforms   = AVAILABLE_PLATFORMS
+  context     = "."
+  dockerfile  = "./php/Dockerfile.base.alpine"
+  matrix = {
+    version = PHP_TAGS
+  }
+  contexts = {
+    php_base_local = "target:php-base-${replace(version, ".", "-")}"
+  }
+  tags = ["${DOCKER_REGISTRY}/php.base.alpine:${version}"]
   args = { PHP_VERSION = version }
 }
 

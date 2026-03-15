@@ -1,0 +1,5 @@
+# docker bake build this image as pre-requsite to be used here
+FROM php_base_local AS php_base
+
+# Install PHP extensions
+RUN install-php-extensions pdo_mysql
