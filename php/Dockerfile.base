@@ -9,4 +9,4 @@ COPY --from=mlocati/php-extension-installer:2.10 /usr/bin/install-php-extensions
 COPY --from=composer/composer:2.9-bin /composer /usr/bin/composer
 
 # install extensions shared in all base images
-RUN install-php-extensions zip amqp opcache apcu pcntl curl intl redis amqp yaml bcmath
+RUN install-php-extensions zip amqp opcache apcu pcntl curl intl redis amqp yaml bcmath soap
