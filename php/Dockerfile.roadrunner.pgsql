@@ -5,4 +5,4 @@ FROM php_base_local AS php_base
 COPY --from=spiralscout/roadrunner:2025.1 /usr/bin/rr /usr/bin/rr
 
 # Install PHP extensions
-RUN install-php-extensions pdo_pgsql pgsql zip opcache apcu pcntl curl sockets intl bcmath redis amqp yaml
+RUN install-php-extensions pdo_pgsql pgsql sockets

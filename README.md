@@ -9,12 +9,9 @@ We provide a Makefile with some targets to build and push the images to a Docker
 the root of the repository.
 
 ```bash
-$ make build-php-static-cli
-$ make build-php-roadrunner-mysql
-$ make push-php-roadrunner-mysql
-$ make build-skaffold-slim
-$ make build-php-chromium
-
+$ make build-php-based
+$ make build-postgresql-based
+$ make build-skaffold-based
 $ make buld-all
 ```
 
@@ -30,6 +27,7 @@ $ make buld-all
       use [static-php-cli](https://github.com/crazywhalecc/static-php-cli) + [Google Distroless](https://github.com/GoogleContainerTools/distroless)
       images.
   - `ghcr.io/racastellanosm/php.all.extensions`
+  - `ghcr.io/racastellanosm/php.base.alpine`
   - `ghcr.io/racastellanosm/php.chromium`
   - `ghcr.io/racastellanosm/php.roadrunner.mysql`
   - `ghcr.io/racastellanosm/php.roadrunner.pgsql`

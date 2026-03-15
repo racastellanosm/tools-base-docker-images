@@ -2,7 +2,7 @@
 FROM php_base_local AS php_base
 
 # Install php extensions
-RUN install-php-extensions pdo_mysql pdo_pgsql zip amqp opcache apcu redis pcntl curl sockets intl xdebug soap
+RUN install-php-extensions pdo_mysql pdo_pgsql sockets xdebug
 
 # Activate Xdebug mode covera in php.ini
 RUN echo "xdebug.mode=coverage" | tee -a "$PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini"
